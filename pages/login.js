@@ -1,121 +1,83 @@
-/**
- * Página de Login
- * Usuário faz login com Google aqui
- */
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/router";
 
 export default function Login() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    // Verifica se já está logado
-    const checkUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
-      if (user) {
-        router.push("/dashboard");
-      }
-    };
-    checkUser();
-  }, [router]);
-
-  const handleGoogleLogin = async () => {
+  async function handleLogin() {
     setLoading(true);
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-        },
-      });
 
-      if (error) {
-        alert("Erro ao fazer login: " + error.message);
-      }
-    } catch (error) {
-      alert("Erro: " + error.message);
-    } finally {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`,
+      },
+    });
+
+    if (error) {
+      alert("Erro ao fazer login: " + error.message);
       setLoading(false);
     }
-  };
+  }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.box}>
-        <h1 style={styles.title}>🏀 Super Master League v2</h1>
-        <p style={styles.subtitle}>Fantasy NBA Para Você e Seus Amigos</p>
+    <main style={styles.container}>
+      <section style={styles.card}>
+        <h1 style={styles.title}>Super Master League v2</h1>
+        <p style={styles.subtitle}>Fantasy NBA para você e seus amigos</p>
 
-        <button
-          onClick={handleGoogleLogin}
-          disabled={loading}
-          style={{
-            ...styles.button,
-            opacity: loading ? 0.6 : 1,
-            cursor: loading ? "not-allowed" : "pointer",
-          }}
-        >
-          {loading ? "Carregando..." : "Login com Google"}
+        <button style={styles.button} onClick={handleLogin} disabled={loading}>
+          {loading ? "Carregando..." : "Entrar com Google"}
         </button>
 
-        <p style={styles.info}>
-          ℹ️ Use sua conta Google para entrar e começar a criar sua liga!
+        <p style={styles.note}>
+          Use sua conta Google para entrar e começar a criar sua liga.
         </p>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
 
 const styles = {
   container: {
+    minHeight: "100vh",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    minHeight: "100vh",
-    backgroundColor: "#0a0e27",
-    fontFamily: "sans-serif",
+    background: "#0a0e27",
+    fontFamily: "Arial, sans-serif",
+    color: "#fff",
   },
-  box: {
-    textAlign: "center",
-    backgroundColor: "#1a1f3a",
-    padding: "60px 40px",
-    borderRadius: "12px",
-    boxShadow: "0 10px 40px rgba(0,0,0,0.3)",
-    maxWidth: "400px",
+  card: {
     width: "100%",
+    maxWidth: "420px",
+    background: "#1a1f3a",
+    borderRadius: "12px",
+    padding: "40px",
+    textAlign: "center",
   },
   title: {
-    color: "#fff",
-    fontSize: "36px",
+    fontSize: "32px",
     marginBottom: "10px",
-    fontWeight: "bold",
   },
   subtitle: {
     color: "#b0b3c1",
-    fontSize: "16px",
-    marginBottom: "40px",
+    marginBottom: "30px",
   },
   button: {
     width: "100%",
-    padding: "14px 20px",
-    backgroundColor: "#1f6feb",
-    color: "white",
+    padding: "14px",
+    borderRadius: "8px",
     border: "none",
-    borderRadius: "6px",
+    background: "#1f6feb",
+    color: "#fff",
     fontSize: "16px",
     fontWeight: "bold",
     cursor: "pointer",
-    transition: "background-color 0.3s",
   },
-  info: {
+  note: {
+    marginTop: "20px",
     color: "#8b8d99",
     fontSize: "14px",
-    marginTop: "20px",
   },
 };
